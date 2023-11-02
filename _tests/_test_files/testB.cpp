@@ -200,17 +200,19 @@ bool test_split(bool debug){
     cout<<endl; 
   }
 }
+//double free
 
 bool test_copy_tree(bool debug){
   if(debug){
     cout<<"TEST - COPY - TREE\n"; 
-    int data[] = {10,20,30,40,50}; 
-    int size = 5; 
+    //int data[] = {10,20,30,40,50}; 
+    //int size = 5; 
     BTree<int> copyThis; 
     BTree<int> afterCopy; 
 
-    for(int i = 0; i < size; i++){
-      copyThis.insert(data[i]); 
+    for(int i = 0; i < 20; i++){
+      int rando = rand() % 800 + 100; 
+      copyThis.insert(rando); 
     }
 
     cout<<"copy this tree struct: "<<endl; 
@@ -220,6 +222,12 @@ bool test_copy_tree(bool debug){
 
     cout<<"after copy: "<<endl;
     cout<<afterCopy<<endl; 
+
+    string inOrder1 = copyThis.in_order(); 
+    string inOrder2 = afterCopy.in_order(); 
+    cout<<"inOrder1: "<<inOrder1<<endl; 
+    cout<<"inOrder2: "<<inOrder2<<endl; 
+    cout<<"equal?: "<<(inOrder1 == inOrder2)<<endl; 
 
   }
   return true; 
@@ -416,7 +424,7 @@ TEST(TEST_BTREE, testRemove){
 }
 
 TEST(TEST_BTREE, testCopy){
-  EXPECT_EQ(1, test_copy_tree(false));
+  EXPECT_EQ(1, test_copy_tree(true));
 }
 
 TEST(TEST_BTREE, testClear){
@@ -428,7 +436,7 @@ TEST(TEST_BTREE, testInOrder){
 }
 
 TEST(TEST_BTREE, testGet){
-  EXPECT_EQ(1, test_get(true)); 
+  EXPECT_EQ(1, test_get(false)); 
 }
 
 TEST(TEST_ARR_FUNCTIONS, testOrderedInsert){

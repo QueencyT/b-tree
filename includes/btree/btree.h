@@ -354,13 +354,11 @@ void BTree<T>::clear_tree(){//delete from bottom up
 template <typename T> 
 void BTree<T>::copy_tree(const BTree<T>& other){//assuming we are already empty? //assuming other is not empty? --> gotta test
     copy_array(data, other.data, data_count, other.data_count); //copying other data 
-    child_count = data_count + 1; 
-
+    child_count = data_count + 1;
     for(int i = 0; i < other.child_count && !other.is_leaf(); i++){//if other is a leaf then there is nothing else to copy
         BTree<T>* copyChild = new BTree<T>; 
         subset[i] = copyChild; 
-        BTree<T> copyThis(other.subset[i]->data, other.subset[i]->data_count); 
-        subset[i]->copy_tree(copyThis); //technically was passing in ptr to be copied not an acutal BTree
+        subset[i]->copy_tree(*other.subset[i]); //technically was passing in ptr to be copied not an acutal BTree
     }
 }//copy other into this object
 
