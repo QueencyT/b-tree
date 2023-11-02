@@ -376,6 +376,24 @@ bool test_in_order(bool debug){
   }
 }
 
+bool test_get(bool debug){
+  if(debug){
+    cout<<"TEST - FIND\n"; 
+    BTree<int> mTree; 
+    int dat[] = {10,20,30,40,50}; 
+    for(int i = 0; i < 5; i++){
+      mTree.insert(dat[i]); 
+    }
+
+    cout<<"curr tree structure: \n"; 
+    cout<<mTree<<endl; 
+    const int temp = 10; 
+    cout<<"get: 10"<<endl; 
+    int theVar = mTree.get(temp); 
+    cout<<"got: "<<theVar<<endl; 
+  }
+  return true; 
+}
 TEST(TEST_BTREE, testSize){
   EXPECT_EQ(1, test_size(false)); 
 }
@@ -390,7 +408,7 @@ TEST(TEST_BTREE, testFind){
 }
 
 TEST(TEST_INSERT, testInsert){
-  EXPECT_EQ(1, test_insert(true)); 
+  EXPECT_EQ(1, test_insert(false)); 
 }
 
 TEST(TEST_BTREE, testRemove){
@@ -407,6 +425,10 @@ TEST(TEST_BTREE, testClear){
 
 TEST(TEST_BTREE, testInOrder){
   EXPECT_EQ(1, test_in_order(false)); 
+}
+
+TEST(TEST_BTREE, testGet){
+  EXPECT_EQ(1, test_get(true)); 
 }
 
 TEST(TEST_ARR_FUNCTIONS, testOrderedInsert){

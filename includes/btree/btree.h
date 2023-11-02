@@ -370,8 +370,9 @@ bool BTree<T>::contains(const T& entry){
 }//true if entry can be found in the array 
 
 template <typename T>
-T& get(const T& entry){
-    //
+T& BTree<T>::get(const T& entry){
+    T* mData = find(entry); 
+    return *mData; 
 }                    
 //return a reference to entry in the tree 
 
