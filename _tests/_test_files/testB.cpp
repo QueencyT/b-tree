@@ -1,24 +1,429 @@
 #include "gtest/gtest.h"
 #include <iostream>
 #include <iomanip>
+#include "../../includes/btree/btree.h"
+#include <vector>
+
 using namespace std;
 
-bool test_stub(bool debug = false)
-{
-  if (debug){
-    cout << "testB:: test-sub() entering test_sub" << endl;
+
+bool test_print(bool debug){
+  if(debug){
+    cout<<"TEST - BTREE - PRINT\n"; 
+    int mData[] = {100, 200}; 
+    BTree<int> mTree(mData, 2, false); //no dups //first layer 
+
+    int mData2[] = {90}; 
+    //mTree.subset[0] = new BTree<int>(mData2, 1, false); 
+    int mData3[] = {150}; 
+   // mTree.subset[1] = new BTree<int>(mData3, 1, false); 
+    int mData4[] = {250}; 
+    //mTree.subset[2] = new BTree<int>(mData4, 1, false); 
+
+    mTree.print_tree(0, cout); 
   }
-  return true;
+  return true; 
 }
 
-TEST(TEST_STUB, TestStub) {
+bool test_find(bool debug){
+  if(debug){
+    cout<<"TEST- BTREE - FIND\n"; 
+    int mData[] = {100, 200}; 
+    BTree<int> mTree(mData, 2, false); //no dups //first layer 
+
+    int mData2[] = {90}; 
+    //mTree.subset[0] = new BTree<int>(mData2, 1, false); 
+    int mData3[] = {150, 190}; 
+    //mTree.subset[1] = new BTree<int>(mData3, 2, false); 
+    int mData4[] = {250}; 
+    //mTree.subset[2] = new BTree<int>(mData4, 1, false); 
+    
+
+    cout<<"curr tree structure: "<<endl; 
+    mTree.print_tree(0, cout); 
+
+    cout<<"finding: 150"<<endl; 
+    int* found = mTree.find(150); 
+
+    if(found)
+      cout<<"found: "<<*found<<endl; 
+   
+  }
+}
+
+bool test_size(bool debug){
+  if(debug){
+    cout<<"TEST - SIZE\n"; 
+
+    int mData[] = {100, 200}; 
+    BTree<int> mTree(mData, 2, false); //no dups //first layer 
+
+    int mData2[] = {90}; 
+    //mTree.subset[0] = new BTree<int>(mData2, 1, false); 
+    int mData3[] = {150, 190}; 
+    //mTree.subset[1] = new BTree<int>(mData3, 2, false); 
+    int mData4[] = {250}; 
+    //mTree.subset[2] = new BTree<int>(mData4, 1, false); 
+
+    int mData5[] = {70,80}; 
+   // mTree.subset[0]->subset[0] = new BTree<int>(mData5, 2, false);
+
+    int mData6[] = {120}; 
+   // mTree.subset[1]->subset[0] = new BTree<int>(mData6, 1, false);
+
+    cout<<"curr tree structure: "<<endl; 
+    mTree.print_tree(0, cout); 
+
+    cout<<"size of tree: "<<mTree.size()<<endl; 
+  }
+  return true; 
+}
+
+bool test_insert(bool debug){
+  if(false){
+    cout<<"TEST - INSERT\n"; 
+
+     int mData[] = {100, 200}; 
+    BTree<int> mTree(mData, 2, false); //no dups //first layer 
+
+    int mData2[] = {80,90}; 
+   // mTree.subset[0] = new BTree<int>(mData2, 2, false); 
+    int mData3[] = {150, 190}; 
+   // mTree.subset[1] = new BTree<int>(mData3, 2, false); 
+    int mData4[] = {250}; 
+   // mTree.subset[2] = new BTree<int>(mData4, 1, false); 
+    
+
+    cout<<"curr tree structure: "<<endl; 
+    mTree.print_tree(0, cout);  
+
+    cout<<"inserting: 70"<<endl; 
+    mTree.insert(70);
+
+    cout<<"after insertion "<<endl; 
+    mTree.print_tree(0, cout); 
+  }
+
+  if(false){
+    cout<<"TEST - INSERT\n"; 
+
+    BTree<int> mTree; 
+    srand(time(0)); 
+   // int mData[] = {220,449,467,362,834,349,403,1056, 214, 280, 980};
+    int size = 8;  
+    int rando; 
+
+    for(int i = 0; i < 100; i++){
+      rando = rand() % 999 + 100;
+      cout<<"inserting: "<<rando<<endl; 
+      mTree.insert(rando); 
+    }
   
-  //EXPECT_EQ(0, <your individual test functions are called here>);
+    cout<<"curr tree structure\n"; 
+    mTree.print_tree(0, cout);
 
-  EXPECT_EQ(1, test_stub(false));
+  }
+
+  if(debug){
+    cout<<"TEST - INSERT - DUPS\n";
+    BTree<int> mTree; 
+    int dat[] = {10,20,30,40,50,50,10}; 
+    int size = 7; 
+    for(int i = 0; i < size; i++){
+      mTree.insert(dat[i]); 
+    }
+
+    cout<<"tree structure: "<<endl; 
+    cout<<mTree<<endl; 
+  }
 }
 
 
+bool test_ordered_insert(bool debug){
+  if(debug){
+    cout<<"TESTING: ORDERED INSERT \n"; 
+    int mData[] = {90}; 
+    int count = 1; 
+
+    cout<<"arr befrore: "<<endl; 
+    for(int i = 0; i < count; i++){
+      cout<<mData[i]<<" "; 
+    } 
+
+    cout<<endl; 
+    ordered_insert(mData, count, 80); 
+
+    cout<<"after: "<<endl; 
+    for(int i = 0; i < count; i++){
+      cout<<mData[i]<<" "; 
+    }
+    
+    cout<<endl;
+   
+  }
+}
+
+bool test_delete(bool debug){
+  if(debug){
+    cout<<"TEST - DELETE\n"; 
+    int mData[] = {10,20,30}; 
+    int deleted; 
+    int size = 3; 
+    delete_item(mData, 2, size, deleted); 
+    
+    for(int i = 0; i < size; i++){
+      cout<<mData[i]<<" "; 
+    }
+    cout<<endl; 
+  }
+  return true; 
+}
+
+bool test_split(bool debug){
+  if(debug){
+    cout<<"TEST - SPLIT\n"; 
+    int mData1[] = {100,200,300,400}; 
+    int size1 = 4; 
+    int mData2[] = {}; 
+    int size2 = 0; 
+
+    split(mData1, size1, mData2, size2);
+
+    for(int i = 0; i < size1; i++){
+      cout<<mData1[i]<<" "; 
+    }
+    cout<<endl; 
+
+    for(int i = 0; i < size2; i++){
+      cout<<mData2[i]<<" "; 
+    }
+    cout<<endl; 
+  }
+}
+
+bool test_copy_tree(bool debug){
+  if(debug){
+    cout<<"TEST - COPY - TREE\n"; 
+    int data[] = {10,20,30,40,50}; 
+    int size = 5; 
+    BTree<int> copyThis; 
+    BTree<int> afterCopy; 
+
+    for(int i = 0; i < size; i++){
+      copyThis.insert(data[i]); 
+    }
+
+    cout<<"copy this tree struct: "<<endl; 
+    cout<<copyThis<<endl; 
+
+    afterCopy.copy_tree(copyThis); 
+
+    cout<<"after copy: "<<endl;
+    cout<<afterCopy<<endl; 
+
+  }
+  return true; 
+}
+
+bool test_clear_tree(bool debug){
+  if(debug){
+    cout<<"TEST - DELETE\n"; 
+    int data[] = {10,20,30,40,50}; 
+    int size = 5; 
+    BTree<int> mTree;  
+
+    for(int i = 0; i < size; i++){
+      mTree.insert(data[i]); 
+    }
+
+    cout<<"curr tree structure: "<<endl; 
+    cout<<mTree<<endl; 
+
+    mTree.clear_tree(); 
+
+    cout<<"after clear: "<<endl;
+    cout<<mTree<<endl; 
+  }
+}
+
+bool test_remove(bool debug){
+  if(false){
+    cout<<"TEST - DELETE - MERGE - WITH POOR SIBLING\n"; 
+    int data[] = {10,20,30,40,50}; 
+    int size = 5; 
+    BTree<int> mTree;  
+
+    for(int i = 0; i < size; i++){
+      mTree.insert(data[i]); 
+    }
+
+    cout<<"curr tree structure: "<<endl; 
+    cout<<mTree<<endl; 
+
+    
+    cout<<"deleting: 50 - END CASE"<<endl; 
+    mTree.remove(50); 
+    cout<<mTree<<endl; 
+
+    mTree.insert(50); 
+
+    cout<<"deleting: 30 - MID CASE"<<endl; 
+    mTree.remove(30); 
+    cout<<mTree<<endl; 
+
+    mTree.insert(30);
+    
+  
+    cout<<"deleting: 10 - BEGINNING CASE"<<endl; 
+    mTree.remove(10); 
+    cout<<mTree<<endl; 
+
+    
+  }
+
+  if(false){
+    cout<<"TEST - DELETE - WITH RICH SIBLING"<<endl; 
+    int data[] = {20, 40, 10, 30, 35, 50, 60, 45}; 
+    int size = 8; 
+    BTree<int> mTree;  
+
+    for(int i = 0; i < size; i++){
+      mTree.insert(data[i]); 
+    }
+
+    cout<<"curr tree structure: "<<endl; 
+    cout<<mTree<<endl; 
+
+    cout<<"DELETING 60 - MID CASE"<<endl; 
+    mTree.remove(60); 
+    cout<<mTree<<endl; 
+
+
+  }
+
+  if(debug){
+    cout<<"TEST - COMPLEX"<<endl; 
+    srand(time(0));
+    int data[] = {10,21,30,41,50,60,70,80,90,100,110};
+    int size = 11; 
+    BTree<int> mTree;
+
+    /*for(int i = 0; i < 10; i++){
+      int rando = rand() % 800 + 100; 
+      mVec.push_back(rando); 
+    }
+
+    for(int i = 0; i < 10; i++){
+      mTree.insert(mVec[i]);
+    }*/
+
+    for(int i = 0; i < size; i++){
+      mTree.insert(data[i]); 
+    }
+
+    cout<<"curr tree: "<<endl; 
+    cout<<mTree<<endl; 
+
+    mTree.remove(60);
+    cout<<"----------------------\n";
+    cout<<mTree<<endl; 
+
+   /* while(!mTree.empty()){
+      int rando = rand() % mVec.size(); 
+      cout<<"deleting: "<<mVec[rando]<<endl; 
+      mTree.remove(mVec[rando]);
+      cout<<mTree<<endl; 
+      cout<<"----------------------------\n";
+    }*/
+  }
+  return true; 
+}
+
+bool test_merge(bool debug){
+  if(debug){
+    cout<<"TEST - MERGE\n"; 
+    int dat1[] = {1,2,3,4};
+    int size1 = 4; 
+    int dat2[] = {5,6,7,8}; 
+    int size2 = 4; 
+
+    merge(dat1, size1, dat2, size2); 
+     
+    for(int i = 0; i < size1; i++){
+      //cout<<"i: "<<i<<endl; 
+      cout<<dat1[i]<<" "; 
+
+      //cout<<"dat4: "<<dat1[4]<<endl; 
+    }
+    cout<<endl; 
+  }
+  return true; 
+}
+
+bool test_in_order(bool debug){
+  if(debug){
+    cout<<"TEST - IN - ORDER\n"; 
+    BTree<int> mTree; 
+    int dat[] = {10,20,30,40,50}; 
+    for(int i = 0; i < 5; i++){
+      mTree.insert(dat[i]); 
+    }
+
+    cout<<"curr tree structure: "<<endl; 
+    cout<<mTree<<endl; 
+    string inOrder = mTree.in_order(); 
+    cout<<"in order: "<<inOrder<<endl; 
+  }
+}
+
+TEST(TEST_BTREE, testSize){
+  EXPECT_EQ(1, test_size(false)); 
+}
+
+TEST(TEST_BTREE, testPrint){
+  EXPECT_EQ(1, test_print(false)); 
+}
+
+
+TEST(TEST_BTREE, testFind){
+  EXPECT_EQ(1, test_find(false)); 
+}
+
+TEST(TEST_INSERT, testInsert){
+  EXPECT_EQ(1, test_insert(true)); 
+}
+
+TEST(TEST_BTREE, testRemove){
+  EXPECT_EQ(1, test_remove(false)); 
+}
+
+TEST(TEST_BTREE, testCopy){
+  EXPECT_EQ(1, test_copy_tree(false));
+}
+
+TEST(TEST_BTREE, testClear){
+  EXPECT_EQ(1, test_clear_tree(false)); 
+}
+
+TEST(TEST_BTREE, testInOrder){
+  EXPECT_EQ(1, test_in_order(false)); 
+}
+
+TEST(TEST_ARR_FUNCTIONS, testOrderedInsert){
+  EXPECT_EQ(1, test_ordered_insert(false)); 
+}
+
+TEST(TEST_ARR_FUNCTIONS, testDelete){
+  EXPECT_EQ(1, test_delete(false)); 
+}
+
+TEST(TEST_ARR_FUNCTIONS, testSplit){
+  EXPECT_EQ(1, test_split(false)); 
+}
+
+TEST(TEST_ARR_FUNCTIONS, testMerge){
+  EXPECT_EQ(1, test_merge(false));
+}
 
 
 int main(int argc, char **argv) {
