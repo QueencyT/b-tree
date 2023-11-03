@@ -179,8 +179,10 @@ template <typename T>
 void BTree<T>::fix_shortage(int shortIndex){
     T deleted; 
     BTree<T>* left = nullptr; 
+    BTree<T>* right = nullptr; 
     BTree<T>* shortChild = subset[shortIndex]; //data_count should be 0 in this case
-    BTree<T>* right = subset[shortIndex + 1]; 
+    if(shortIndex != child_count - 1)
+        right = subset[shortIndex + 1]; 
     if(shortIndex != 0)
         left = subset[shortIndex - 1];
     bool STEAL_RIGHT = (right && right->data_count > MINIMUM), STEAL_LEFT = left && left->data_count > MINIMUM, 
@@ -304,7 +306,6 @@ void BTree<T>::loose_insert(const T& entry){
     }
 
     subset[insertIndex]->loose_insert(entry);
-
     BTree<T>* fatChild = subset[insertIndex]; //possibly fat child //it has to be the subset at the insertedIndex whos fat 
 
     if(fatChild->data_count > MAXIMUM){//we are in excess 
