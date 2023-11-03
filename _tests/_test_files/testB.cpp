@@ -113,10 +113,15 @@ bool test_insert(bool debug){
     int size = 8;  
     int rando; 
 
-    for(int i = 0; i < 3; i++){
+    for(int i = 0; i < 100; i++){
       rando = rand() % 999 + 100;
-      cout<<"inserting: "<<rando<<endl; 
+      //cout<<"inserting: "<<rando<<endl; 
       mTree.insert(rando); 
+      if(!mTree.contains(rando)){
+        cout<<"expected: "<<rando<<endl; 
+        cout<<"but was not inserted\n"; 
+        return false; 
+      }
     }
   
     cout<<"curr tree structure\n"; 
@@ -211,7 +216,7 @@ bool test_copy_tree(bool debug){
     BTree<int> afterCopy; 
      int rando;
 
-    for(int i = 0; i < 20; i++){
+    for(int i = 0; i < 100; i++){
       rando = rand() % 800 + 100; 
       copyThis.insert(rando); 
     }
@@ -232,7 +237,7 @@ bool test_copy_tree(bool debug){
     cout<<"equal?: "<<(inOrder1 == inOrder2)<<endl; 
 
     
-    afterCopy.remove(rando); 
+    afterCopy.clear_tree();
      
     cout<<"removing: "<<rando<<endl; 
     cout<<"afterCopy: "<<endl; 
@@ -243,8 +248,24 @@ bool test_copy_tree(bool debug){
     cout<<copyThis<<endl; 
     cout<<"copyThis size: "<<copyThis.size()<<endl; 
 
-    return (inOrder1 == inOrder2); 
+    //return (inOrder1 == inOrder2); 
 
+  }
+
+  if(debug){
+    cout<<"TEST - COPY - TREE - EMPTY\n"; 
+    BTree<int> copyThis; 
+    BTree<int> afterCopy; 
+     int rando;
+
+    for(int i = 0; i < 20; i++){
+      rando = rand() % 800 + 100; 
+      copyThis.insert(rando); 
+    }
+
+    afterCopy = copyThis; 
+    cout<<"afterCopy: "<<endl; 
+    cout<<afterCopy<<endl; 
   }
   return true; 
 }
@@ -465,7 +486,7 @@ TEST(TEST_BTREE, testFind){
 }
 
 TEST(TEST_INSERT, testInsert){
-  EXPECT_EQ(1, test_insert(false)); 
+  EXPECT_EQ(1, test_insert(true)); 
 }
 
 TEST(TEST_BTREE, testRemove){

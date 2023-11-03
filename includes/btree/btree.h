@@ -369,7 +369,7 @@ void BTree<T>::copy_tree(const BTree<T>& other){//assuming we are already empty?
     for(int i = 0; i < other.child_count; i++){//if other is a leaf then there is nothing else to copy
         BTree<T>* copyChild = new BTree<T>; 
         subset[i] = copyChild; 
-        subset[i]->copy_tree(*other.subset[i]); //technically was passing in ptr to be copied not an acutal BTree
+        subset[i]->copy_tree(*other.subset[i]);
     }
 }//copy other into this object
 
@@ -416,8 +416,8 @@ int BTree<T>::size() const{
 
 template <typename T>
 bool BTree<T>::empty() const{
-    cout<<"child count: "<<child_count<<endl; 
-    cout<<"data count: "<<data_count<<endl; 
+    //cout<<"child count: "<<child_count<<endl; 
+    //cout<<"data count: "<<data_count<<endl; 
     return (data_count == 0 && child_count == 0); //i think? cause if we have no data than we must be empty
 }  //true if the tree is empty
 
@@ -427,7 +427,7 @@ void BTree<T>::print_tree(int level, ostream &outs) const{ //needs testing
         if(i!= -1 && !is_leaf())
             subset[i]->print_tree(level + 1, outs); //child will always be one more than data count  
         if(i!= 0){
-            outs<<setw(6 * level)<<"["<<data[i - 1]<<"]"<<endl; 
+            outs<<setw(6 * level)<<"["<<data[i - 1]<<"]"<<"cc: "<<child_count<<endl; 
         }
            
 
@@ -441,7 +441,7 @@ string inOrder = "";
     for(int i = 0; i <= data_count; i++){
         if(!is_leaf())
             inOrder += subset[i]->in_order();
-        if(i < child_count - 1) 
+        if(i < data_count) 
             inOrder+= to_string(data[i]) + "|"; 
     }
     return inOrder; 
