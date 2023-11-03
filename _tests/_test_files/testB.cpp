@@ -209,9 +209,10 @@ bool test_copy_tree(bool debug){
     //int size = 5; 
     BTree<int> copyThis; 
     BTree<int> afterCopy; 
+     int rando;
 
     for(int i = 0; i < 20; i++){
-      int rando = rand() % 800 + 100; 
+      rando = rand() % 800 + 100; 
       copyThis.insert(rando); 
     }
 
@@ -225,9 +226,24 @@ bool test_copy_tree(bool debug){
 
     string inOrder1 = copyThis.in_order(); 
     string inOrder2 = afterCopy.in_order(); 
+
     cout<<"inOrder1: "<<inOrder1<<endl; 
     cout<<"inOrder2: "<<inOrder2<<endl; 
     cout<<"equal?: "<<(inOrder1 == inOrder2)<<endl; 
+
+    
+    afterCopy.remove(rando); 
+     
+    cout<<"removing: "<<rando<<endl; 
+    cout<<"afterCopy: "<<endl; 
+    cout<<afterCopy<<endl; 
+    cout<<"afterCop size: "<<afterCopy.size()<<endl; 
+
+    cout<<"copyThis: "<<endl;
+    cout<<copyThis<<endl; 
+    cout<<"copyThis size: "<<copyThis.size()<<endl; 
+
+    return (inOrder1 == inOrder2); 
 
   }
   return true; 
@@ -236,12 +252,14 @@ bool test_copy_tree(bool debug){
 bool test_clear_tree(bool debug){
   if(debug){
     cout<<"TEST - DELETE\n"; 
-    int data[] = {10,20,30,40,50}; 
-    int size = 5; 
+   // int data[] = {10,20,30,40,50}; 
+   // int size = 5; 
     BTree<int> mTree;  
+    int rando; 
 
-    for(int i = 0; i < size; i++){
-      mTree.insert(data[i]); 
+    for(int i = 0; i < 20; i++){
+      rando = rand() % 800 + 100; 
+      mTree.insert(rando); 
     }
 
     cout<<"curr tree structure: "<<endl; 
@@ -252,10 +270,28 @@ bool test_clear_tree(bool debug){
     cout<<"after clear: "<<endl;
     cout<<mTree<<endl; 
   }
+
+  if(debug){
+    cout<<"TEST - DELETE \n"; 
+     BTree<int> mTree; 
+    int data[] = {10,20}; 
+    
+    for(int i = 0; i < 2; i++){
+      mTree.insert(data[i]); 
+    }
+
+    cout<<"curr tree: \n"; 
+    cout<<mTree<<endl; 
+
+    mTree.clear_tree(); 
+
+    cout<<"after clear: "<<endl;
+    cout<<mTree<<endl; 
+  }
 }
 
 bool test_remove(bool debug){
-  if(false){
+  if(true){
     cout<<"TEST - DELETE - MERGE - WITH POOR SIBLING\n"; 
     int data[] = {10,20,30,40,50}; 
     int size = 5; 
@@ -309,7 +345,7 @@ bool test_remove(bool debug){
 
   }
 
-  if(debug){
+  if(false){
     cout<<"TEST - COMPLEX"<<endl; 
     srand(time(0));
     int data[] = {10,21,30,41,50,60,70,80,90,100,110};
@@ -420,7 +456,7 @@ TEST(TEST_INSERT, testInsert){
 }
 
 TEST(TEST_BTREE, testRemove){
-  EXPECT_EQ(1, test_remove(false)); 
+  EXPECT_EQ(1, test_remove(true)); 
 }
 
 TEST(TEST_BTREE, testCopy){
@@ -428,7 +464,7 @@ TEST(TEST_BTREE, testCopy){
 }
 
 TEST(TEST_BTREE, testClear){
-  EXPECT_EQ(1, test_clear_tree(false)); 
+  EXPECT_EQ(1, test_clear_tree(true)); 
 }
 
 TEST(TEST_BTREE, testInOrder){

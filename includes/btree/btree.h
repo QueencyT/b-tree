@@ -136,7 +136,7 @@ void BTree<T>::rotate_left(int index){//hmm
     T deleted;
     BTree<T>* shortChild = subset[index];  //rotate to 
     BTree<T>* right = subset[index + 1]; //borrowing from right
-    delete_item(data, index, data_count, deleted); 
+    delete_item(data, index, data_count, deleted); //might just do a swap here hmm
     ordered_insert(shortChild->data, shortChild->data_count, deleted);
     delete_item(right->data, 0,right->data_count, deleted); 
     ordered_insert(data, data_count, deleted); 
@@ -151,7 +151,7 @@ void BTree<T>::rotate_right(int index){//not deleting anything when rotating
     T deleted; 
     BTree<T>* shortChild = subset[index]; 
     BTree<T>* left = subset[index - 1]; 
-    delete_item(data, 0, data_count, deleted); //last item //could maybe just do a swap here hmm
+    delete_item(data, 0, data_count, deleted); //might just do a swap here hmm
     ordered_insert(shortChild->data, shortChild->data_count, deleted); 
     delete_item(left->data, left->data_count - 1, left->data_count, deleted); 
     ordered_insert(data, data_count, deleted); 
@@ -263,7 +263,7 @@ void BTree<T>::remove(const T& entry){ //some later time
 //call find and then loose remove
     loose_remove(entry); 
     BTree<T>* child = subset[0]; 
-    if(empty() && !is_leaf()){//if we ourself is short 
+    if(empty() && !is_leaf()){//if we ourself is short //maybe empty should just be size = 0
         child_count = 0;
         merge(data, data_count, child->data, child->data_count); 
         merge(subset, child_count, child->subset, child->child_count); 
@@ -338,8 +338,10 @@ void BTree<T>::insert(const T& entry){ //looking for a space to insert
 
 template <typename T>
 void BTree<T>::clear_tree(){//delete from bottom up 
-    if(is_leaf()){
-         return; 
+    if(is_leaf()){ 
+        data_count = 0; 
+        child_count = 0;
+        return; 
     }
     for(int i = 0; i < child_count; i++){ //meaning there is some child to clear
         subset[i]->clear_tree();  //we go to child and clear it 
