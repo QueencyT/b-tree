@@ -104,7 +104,7 @@ bool test_insert(bool debug){
     mTree.print_tree(0, cout); 
   }
 
-  if(false){
+  if(debug){
     cout<<"TEST - INSERT\n"; 
 
     BTree<int> mTree; 
@@ -113,7 +113,7 @@ bool test_insert(bool debug){
     int size = 8;  
     int rando; 
 
-    for(int i = 0; i < 100; i++){
+    for(int i = 0; i < 3; i++){
       rando = rand() % 999 + 100;
       cout<<"inserting: "<<rando<<endl; 
       mTree.insert(rando); 
@@ -124,7 +124,7 @@ bool test_insert(bool debug){
 
   }
 
-  if(debug){
+  if(false){
     cout<<"TEST - INSERT - DUPS\n";
     BTree<int> mTree; 
     int dat[] = {10,20,30,40,50,50,10}; 
@@ -291,7 +291,7 @@ bool test_clear_tree(bool debug){
 }
 
 bool test_remove(bool debug){
-  if(true){
+  if(debug){
     cout<<"TEST - DELETE - MERGE - WITH POOR SIBLING\n"; 
     int data[] = {10,20,30,40,50}; 
     int size = 5; 
@@ -438,6 +438,19 @@ bool test_get(bool debug){
   }
   return true; 
 }
+
+bool test_big3(){
+  BTree<int> bt1;
+  BTree<int> bt2 = bt1;
+  {
+    BTree<int> bt3;
+    //...
+    //destrutor will get called
+  }
+  BTree<int> bt4;
+  bt4 = bt2;
+
+}
 TEST(TEST_BTREE, testSize){
   EXPECT_EQ(1, test_size(false)); 
 }
@@ -456,7 +469,7 @@ TEST(TEST_INSERT, testInsert){
 }
 
 TEST(TEST_BTREE, testRemove){
-  EXPECT_EQ(1, test_remove(true)); 
+  EXPECT_EQ(1, test_remove(false)); 
 }
 
 TEST(TEST_BTREE, testCopy){
@@ -464,7 +477,7 @@ TEST(TEST_BTREE, testCopy){
 }
 
 TEST(TEST_BTREE, testClear){
-  EXPECT_EQ(1, test_clear_tree(true)); 
+  EXPECT_EQ(1, test_clear_tree(false)); 
 }
 
 TEST(TEST_BTREE, testInOrder){

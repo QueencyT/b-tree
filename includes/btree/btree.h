@@ -76,7 +76,8 @@ private:
    
 
     bool is_leaf() const {
-        return (!subset[0] || child_count == 0); //does not have a child
+        return (child_count == 0); 
+        //return (!subset[0] || child_count == 0); //does not have a child
     } //true if this is a leaf node
 
     //insert element functions
@@ -123,7 +124,9 @@ BTree<T>::BTree(T *a, int size, bool dups){ //is a the data --> probably data --
 //big three:
 template <typename T>
 BTree<T>::BTree(const BTree<T>& other){ //copy ctor 
-    copy_tree(other); 
+    child_count = 0; 
+    data_count = 0; 
+    copy_tree(other); //should be updated by copy tree
 }
 
 template <typename T>
@@ -140,8 +143,6 @@ void BTree<T>::rotate_left(int index){//hmm
     ordered_insert(shortChild->data, shortChild->data_count, deleted);
     delete_item(right->data, 0,right->data_count, deleted); 
     ordered_insert(data, data_count, deleted); 
-    shortChild->child_count = shortChild->data_count + 1;
-    right->child_count = right->data_count + 1;
 }              
 
 //transfer one element LEFT from child i
@@ -155,8 +156,6 @@ void BTree<T>::rotate_right(int index){//not deleting anything when rotating
     ordered_insert(shortChild->data, shortChild->data_count, deleted); 
     delete_item(left->data, left->data_count - 1, left->data_count, deleted); 
     ordered_insert(data, data_count, deleted); 
-    shortChild->child_count = shortChild->data_count + 1; 
-    left->child_count = left->data_count + 1; 
 }
 //transfer one element RIGHT from child i
 
@@ -168,9 +167,9 @@ void BTree<T>::merge_with_next_subset(int index){ //index of being merged, assum
     merge(merging->data, merging->data_count, right->data, right->data_count); 
     merge(merging->subset, merging->child_count, right->subset, right->child_count);
     delete_item(subset, index+1, child_count, deleted); 
+    //cout<<"deleted: "<<deleted->data[0]<<endl;
     delete deleted; 
     deleted = NULL;
-    merging->child_count = merging->data_count + 1;
 }       
 //merge subset i with subset i + 1
 //merge right with left
@@ -200,20 +199,23 @@ void BTree<T>::fix_shortage(int shortIndex){
         //cout<<"end\n";
         delete_item(data, data_count - 1, data_count, deleted); //delete last
         ordered_insert(shortChild->data, shortChild->data_count, deleted);
-        merge_with_next_subset(shortIndex - 1); 
+        merge_with_next_subset(shortIndex - 1);
+        //child_count--;  merfe with next already takes care of dec chld_count
     }
     else if(BEGIN_CASE){//begin case
-        //cout<<"begin\n";
+        cout<<"begin\n";
+        //cout<<"child_count: "<<child_count<<endl;  
         delete_item(data, 0, data_count, deleted); //delete begin
-        ordered_insert(shortChild->data, shortChild->data_count, deleted);  
+        ordered_insert(shortChild->data, shortChild->data_count, deleted); 
+        //cout<<"child_count: "<<child_count<<endl;  
         merge_with_next_subset(shortIndex); 
+       // cout<<"child_count: "<<child_count<<endl; 
     }
     else{//mid case
         delete_item(data, shortIndex - 1, data_count, deleted); //delete mid
         ordered_insert(shortChild->data, shortChild->data_count, deleted); 
-        merge_with_next_subset(shortIndex - 1); 
+        merge_with_next_subset(shortIndex - 1);  
     }
-
 }      
                                                 
 template <typename T>
@@ -223,6 +225,7 @@ void BTree<T>::loose_remove(const T& entry){ //at this point, im assuming entry 
     if(data[goToIndex] == entry){//found
         T temp; 
         delete_item(data, goToIndex, data_count, temp); 
+        //cout<<"deleted: "<<data[goToIndex]<<endl;  
         if(!is_leaf()){
             T replaceWith; 
             subset[goToIndex]->remove_biggest(replaceWith); //so we don't go to excess replace of this subtree we found
@@ -238,9 +241,7 @@ void BTree<T>::loose_remove(const T& entry){ //at this point, im assuming entry 
 
     if(subset[goToIndex] && subset[goToIndex]->data_count < MINIMUM){
         fix_shortage(goToIndex); //goToIndex should be short index
-    }
-    child_count = data_count + 1; 
-            
+    }         
 } //allows MINIMUM-1 data
 
 
@@ -254,7 +255,6 @@ void BTree<T>::remove_biggest(T& entry){ //find the biggest node of the given tr
     }
     else{//now we are leaf 
         delete_item(data, data_count - 1, data_count, entry); //delete right most and put it into entry 
-        child_count = data_count + 1; 
     }
 }            
 //remove the biggest child of this tree->entry //and put into entry I assumed elements in the root fix shortage of data elements in child i 
@@ -262,16 +262,27 @@ void BTree<T>::remove_biggest(T& entry){ //find the biggest node of the given tr
 
 template <typename T>
 void BTree<T>::remove(const T& entry){ //some later time 
-//call find and then loose remove
+    if(empty()){
+        return; //nothing to remove
+    }
+
     loose_remove(entry); 
     BTree<T>* child = subset[0]; 
-    if(empty() && !is_leaf()){//if we ourself is short //maybe empty should just be size = 0
+ 
+    if(data_count == 0){//if we ourself is short 
+        cout<<"root short\n";
+        cout<<"child: "<<child->data[0]<<endl; 
         child_count = 0;
+
+        
         merge(data, data_count, child->data, child->data_count); 
-        merge(subset, child_count, child->subset, child->child_count); 
+        copy_array(subset, child->subset, data_count, child->data_count); 
+        child->data_count = 0; 
+        child->child_count = 0; 
         delete child; 
         child = nullptr; 
     }
+
 }//remove entry from the tree
 
 
@@ -292,16 +303,13 @@ void BTree<T>::fix_excess(int fatIndex){ //index of fat child
 
     int index = first_ge(data, data_count, right->data[0]); 
     insert_item(subset, index, child_count, right);
-    child_count = data_count + 1; //feel like this is unnecessary
 }//fix excess of data elements //one more than max 
 
 template <typename T>
 void BTree<T>::loose_insert(const T& entry){
     int insertIndex = first_ge(data, data_count, entry);
-
     if(is_leaf()){ //if we finally reached leaf, insert
         ordered_insert(data, data_count, entry); 
-        child_count = data_count + 1;  
         return;  
     }
 
@@ -357,8 +365,8 @@ void BTree<T>::clear_tree(){//delete from bottom up
 template <typename T> 
 void BTree<T>::copy_tree(const BTree<T>& other){//assuming we are already empty? //assuming other is not empty? --> gotta test
     copy_array(data, other.data, data_count, other.data_count); //copying other data 
-    child_count = data_count + 1;
-    for(int i = 0; i < other.child_count && !other.is_leaf(); i++){//if other is a leaf then there is nothing else to copy
+    child_count = other.child_count;
+    for(int i = 0; i < other.child_count; i++){//if other is a leaf then there is nothing else to copy
         BTree<T>* copyChild = new BTree<T>; 
         subset[i] = copyChild; 
         subset[i]->copy_tree(*other.subset[i]); //technically was passing in ptr to be copied not an acutal BTree
@@ -408,17 +416,21 @@ int BTree<T>::size() const{
 
 template <typename T>
 bool BTree<T>::empty() const{
-    return (data_count == 0); //i think? cause if we have no data than we must be empty
+    cout<<"child count: "<<child_count<<endl; 
+    cout<<"data count: "<<data_count<<endl; 
+    return (data_count == 0 && child_count == 0); //i think? cause if we have no data than we must be empty
 }  //true if the tree is empty
 
 template <typename T> 
 void BTree<T>::print_tree(int level, ostream &outs) const{ //needs testing
-    for(int i = child_count - 1; i >= 0; i--){//because start from rightmost 
-        if(subset[i])
-            subset[i]->print_tree(level + 1, outs); //child will always be one more than data count   
-        if(i > 0){
-            outs<<setw(6 * level)<<"["<<data[i-1]<<"]"<<endl; 
+    for(int i = data_count; i >= 0; i--){//because start from rightmost 
+        if(i!= -1 && !is_leaf())
+            subset[i]->print_tree(level + 1, outs); //child will always be one more than data count  
+        if(i!= 0){
+            outs<<setw(6 * level)<<"["<<data[i - 1]<<"]"<<endl; 
         }
+           
+
     }
 }
 //print a readable version of the tree
