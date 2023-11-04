@@ -366,33 +366,43 @@ bool test_remove(bool debug){
 
   }
 
-  if(false){
+  if(true){
     cout<<"TEST - COMPLEX"<<endl; 
     srand(time(0));
     int data[] = {10,21,30,41,50,60,70,80,90,100,110};
     int size = 11; 
     BTree<int> mTree;
+    srand(time(0)); 
 
-    /*for(int i = 0; i < 10; i++){
-      int rando = rand() % 800 + 100; 
-      mVec.push_back(rando); 
+    for(int i = 0; i < 100; i++){
+      int rando = rand() % 100 + 1; 
+      mTree.insert(rando); 
     }
 
-    for(int i = 0; i < 10; i++){
-      mTree.insert(mVec[i]);
+    for(int i = 0; i< 100; i++){
+      int rando = rand() % 100 + 1; 
+      if(mTree.contains(rando)){
+        cout<<"removing: "<<rando<<endl; 
+        mTree.remove(rando); 
+        cout<<mTree<<endl; 
+        cout<<"size: "<<mTree.size()<<endl; 
+        cout<<"------------------------------\n";
+
+        if(mTree.contains(rando)){
+          cout<<"FAILED TO REMOVE: "<<rando<<endl; 
+          cout<<mTree<<endl; 
+          cout<<"size: "<<mTree.size()<<endl; 
+          return false; 
+        }
+      }
+    }
+
+
+  /*  for(int i = 0; i < size; i++){
+      mTree.insert(data[i]); 
     }*/
 
-    for(int i = 0; i < size; i++){
-      mTree.insert(data[i]); 
-    }
-
-    cout<<"curr tree: "<<endl; 
-    cout<<mTree<<endl; 
-
-    mTree.remove(60);
-    cout<<"----------------------\n";
-    cout<<mTree<<endl; 
-
+    
    /* while(!mTree.empty()){
       int rando = rand() % mVec.size(); 
       cout<<"deleting: "<<mVec[rando]<<endl; 
@@ -486,15 +496,15 @@ TEST(TEST_BTREE, testFind){
 }
 
 TEST(TEST_INSERT, testInsert){
-  EXPECT_EQ(1, test_insert(true)); 
+  EXPECT_EQ(1, test_insert(false)); 
 }
 
 TEST(TEST_BTREE, testRemove){
-  EXPECT_EQ(1, test_remove(false)); 
+  EXPECT_EQ(1, test_remove(true)); 
 }
 
 TEST(TEST_BTREE, testCopy){
-  EXPECT_EQ(1, test_copy_tree(true));
+  EXPECT_EQ(1, test_copy_tree(false));
 }
 
 TEST(TEST_BTREE, testClear){

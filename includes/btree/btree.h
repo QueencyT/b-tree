@@ -153,7 +153,7 @@ void BTree<T>::rotate_right(int index){//not deleting anything when rotating
     T deleted; 
     BTree<T>* shortChild = subset[index]; 
     BTree<T>* left = subset[index - 1]; 
-    delete_item(data, 0, data_count, deleted); //might just do a swap here hmm
+    delete_item(data, index - 1, data_count, deleted); //might just do a swap here hmm //was 0 before, what if short index is 0 will never be
     ordered_insert(shortChild->data, shortChild->data_count, deleted); 
     delete_item(left->data, left->data_count - 1, left->data_count, deleted); 
     ordered_insert(data, data_count, deleted); 
@@ -187,11 +187,11 @@ void BTree<T>::fix_shortage(int shortIndex){
     bool STEAL_RIGHT = (right && right->data_count > MINIMUM), STEAL_LEFT = left && left->data_count > MINIMUM, BEGIN_CASE = (shortIndex == 0); 
 
     if(STEAL_RIGHT){//can steal from right
-        //cout<<"steal from right\n";
+        cout<<"steal from right\n";
         rotate_left(shortIndex); 
     }
     else if(STEAL_LEFT){//can steal from left
-        //cout<<"steal from left\n";
+        cout<<"steal from left\n";
         rotate_right(shortIndex); 
     }
     else if(BEGIN_CASE){//begin case
@@ -356,7 +356,7 @@ void BTree<T>::copy_tree(const BTree<T>& other){//assuming we are already empty?
 
 template <typename T>
 bool BTree<T>::contains(const T& entry){
-    return (find(entry) != NULL); 
+    return(find(entry) != nullptr); 
 }//true if entry can be found in the array 
 
 template <typename T>
@@ -369,13 +369,12 @@ T& BTree<T>::get(const T& entry){
 template <typename T> //here
 T* BTree<T>::find(const T& entry){
     int index = first_ge(data, data_count, entry);  //will this work with an empty BTree?
-    T* foundPtr; 
-
+    T* foundPtr = nullptr; 
     if(data[index] == entry){
         return (data + index); 
     }
-    else if(!subset[0]){
-        return NULL; //no children and not found 
+    else if(is_leaf()){
+        return nullptr; //no children and not found 
     }
     else{
         foundPtr = subset[index]->find(entry); 
@@ -406,7 +405,7 @@ void BTree<T>::print_tree(int level, ostream &outs) const{ //needs testing
         if(i!= -1 && !is_leaf())
             subset[i]->print_tree(level + 1, outs); //child will always be one more than data count  
         if(i!= 0){
-            outs<<setw(6 * level)<<"["<<data[i - 1]<<"]"<<"cc: "<<child_count<<endl; 
+            outs<<setw(6 * level)<<"["<<data[i - 1]<<"]"<<"dc: "<<data_count<<endl; 
             //if(child_count == 0 && subset[0])
                 //outs<<"add: "<<subset[0]->data[0]<<endl; 
         
