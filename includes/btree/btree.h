@@ -130,8 +130,9 @@ BTree<T>::BTree(const BTree<T>& other){ //copy ctor
 }
 
 template <typename T>
-BTree<T>::~BTree(){ //destructor 
+BTree<T>::~BTree(){ //destructor  
     clear_tree(); 
+    data_count = 0;  
 }
 
 template <typename T>
@@ -166,10 +167,9 @@ void BTree<T>::merge_with_next_subset(int index){ //index of being merged, assum
     BTree<T>* right = subset[index + 1]; 
     merge(merging->data, merging->data_count, right->data, right->data_count); 
     merge(merging->subset, merging->child_count, right->subset, right->child_count);
-    delete_item(subset, index+1, child_count, deleted); 
-    //cout<<"deleted: "<<deleted->data[0]<<endl;
-    delete deleted; 
-    deleted = NULL;
+    delete_item(subset, index+1, child_count, deleted);
+    delete deleted;
+    deleted = nullptr;
 }       
 //merge subset i with subset i + 1
 //merge right with left
@@ -184,8 +184,7 @@ void BTree<T>::fix_shortage(int shortIndex){
         right = subset[shortIndex + 1]; 
     if(shortIndex != 0)
         left = subset[shortIndex - 1];
-    bool STEAL_RIGHT = (right && right->data_count > MINIMUM), STEAL_LEFT = left && left->data_count > MINIMUM, 
-    END_CASE = (shortIndex == child_count - 1), BEGIN_CASE = (shortIndex == 0); 
+    bool STEAL_RIGHT = (right && right->data_count > MINIMUM), STEAL_LEFT = left && left->data_count > MINIMUM, BEGIN_CASE = (shortIndex == 0); 
 
     if(STEAL_RIGHT){//can steal from right
         //cout<<"steal from right\n";
@@ -195,21 +194,17 @@ void BTree<T>::fix_shortage(int shortIndex){
         //cout<<"steal from left\n";
         rotate_right(shortIndex); 
     }
-    else if(END_CASE){
-        //cout<<"end\n";
-        delete_item(data, shortIndex - 1, data_count, deleted); //delete last
-        ordered_insert(shortChild->data, shortChild->data_count, deleted);
-        merge_with_next_subset(shortIndex - 1);
-        //child_count--;  merfe with next already takes care of dec chld_count
-    }
     else if(BEGIN_CASE){//begin case
         cout<<"begin\n";
-        //cout<<"child_count: "<<child_count<<endl;  
         delete_item(data, 0, data_count, deleted); //delete begin
         ordered_insert(shortChild->data, shortChild->data_count, deleted); 
-        //cout<<"child_count: "<<child_count<<endl;  
         merge_with_next_subset(shortIndex); 
-       // cout<<"child_count: "<<child_count<<endl; 
+    }
+    else{
+        cout<<"end\n";
+        delete_item(data, shortIndex - 1, data_count, deleted); //delete last //first less than equal
+        ordered_insert(shortChild->data, shortChild->data_count, deleted);
+        merge_with_next_subset(shortIndex - 1);
     }
 }      
                                                 
@@ -234,7 +229,6 @@ void BTree<T>::loose_remove(const T& entry){ //at this point, im assuming entry 
     }
 
     if(!is_leaf() && subset[goToIndex]->data_count < MINIMUM){
-        cout<<"fixing short:\n"; 
         fix_shortage(goToIndex); //goToIndex should be short index
     }         
 } //allows MINIMUM-1 data
@@ -268,7 +262,6 @@ void BTree<T>::remove(const T& entry){ //some later time
         copy_array(data, child->data, data_count, child->data_count);
         copy_array(subset, child->subset, child_count, child->child_count); 
 
-            
         child->data_count = 0; 
         child->child_count = 0; 
         delete child; 
@@ -343,7 +336,7 @@ void BTree<T>::clear_tree(){//delete from bottom up
         if(!is_leaf())
             subset[i]->clear_tree();  //we go to child and clear it 
         delete subset[i]; 
-        subset[i] = NULL; //now setting it to null when we get out cause it was deleted. just for sanity
+        subset[i] = nullptr; //now setting it to null when we get out cause it was deleted. just for sanity
     }
     data_count = 0; 
     child_count = 0;
@@ -404,8 +397,6 @@ int BTree<T>::size() const{
 
 template <typename T>
 bool BTree<T>::empty() const{
-    //cout<<"child count: "<<child_count<<endl; 
-    //cout<<"data count: "<<data_count<<endl; 
     return (data_count == 0 && child_count == 0); //i think? cause if we have no data than we must be empty
 }  //true if the tree is empty
 
