@@ -225,7 +225,6 @@ void BTree<T>::loose_remove(const T& entry){ //at this point, im assuming entry 
     if(data[goToIndex] == entry){//found
         T temp; 
         delete_item(data, goToIndex, data_count, temp); 
-        //cout<<"deleted: "<<data[goToIndex]<<endl;  
         if(!is_leaf()){
             T replaceWith; 
             subset[goToIndex]->remove_biggest(replaceWith); //so we don't go to excess replace of this subtree we found
@@ -239,7 +238,8 @@ void BTree<T>::loose_remove(const T& entry){ //at this point, im assuming entry 
         subset[goToIndex]->loose_remove(entry);
     }
 
-    if(subset[goToIndex] && subset[goToIndex]->data_count < MINIMUM){
+    if(!is_leaf() && subset[goToIndex]->data_count < MINIMUM){
+        cout<<"fixing short:\n"; 
         fix_shortage(goToIndex); //goToIndex should be short index
     }         
 } //allows MINIMUM-1 data
@@ -267,16 +267,17 @@ void BTree<T>::remove(const T& entry){ //some later time
     }
 
     loose_remove(entry); 
-    BTree<T>* child = subset[0]; 
- 
-    if(data_count == 0){//if we ourself is short 
-        cout<<"root short\n";
-        cout<<"child: "<<child->data[0]<<endl; 
-        child_count = 0;
+    BTree<T>* child = subset[0];  
+    if(data_count == 0 && !is_leaf()){//if we ourself is short  
+        copy_array(data, child->data, data_count, child->data_count);
 
-        
-        merge(data, data_count, child->data, child->data_count); 
-        copy_array(subset, child->subset, data_count, child->data_count); 
+        if(!child->is_leaf()){ 
+            copy_array(subset, child->subset, child_count, child->child_count); 
+        }
+        else{
+           child_count--; 
+        }
+            
         child->data_count = 0; 
         child->child_count = 0; 
         delete child; 
@@ -347,13 +348,9 @@ void BTree<T>::insert(const T& entry){ //looking for a space to insert
 
 template <typename T>
 void BTree<T>::clear_tree(){//delete from bottom up 
-    if(is_leaf()){ 
-        data_count = 0; 
-        child_count = 0;
-        return; 
-    }
     for(int i = 0; i < child_count; i++){ //meaning there is some child to clear
-        subset[i]->clear_tree();  //we go to child and clear it 
+        if(!is_leaf())
+            subset[i]->clear_tree();  //we go to child and clear it 
         delete subset[i]; 
         subset[i] = NULL; //now setting it to null when we get out cause it was deleted. just for sanity
     }
@@ -428,6 +425,9 @@ void BTree<T>::print_tree(int level, ostream &outs) const{ //needs testing
             subset[i]->print_tree(level + 1, outs); //child will always be one more than data count  
         if(i!= 0){
             outs<<setw(6 * level)<<"["<<data[i - 1]<<"]"<<"cc: "<<child_count<<endl; 
+            //if(child_count == 0 && subset[0])
+                //outs<<"add: "<<subset[0]->data[0]<<endl; 
+        
         }
            
 
