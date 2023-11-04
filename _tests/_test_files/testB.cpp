@@ -382,10 +382,11 @@ bool test_remove(bool debug){
     //cout<<"removing: "<<69<<endl; 
     //mTree.remove(69); 
     //cout<<mTree<<endl;
-
+    int i = 0; 
     while(false){
       int randIndex = rand() % 59; 
       if(mTree.contains(data[randIndex])){
+        cout<<"i: "<<i<<endl; 
         cout<<"removing: "<<data[randIndex]<<endl; 
         mTree.remove(data[randIndex]); 
         cout<<mTree<<endl; 
@@ -400,6 +401,7 @@ bool test_remove(bool debug){
           cout<<"in order: "<<mTree.in_order()<<endl; 
           return false; 
         }
+        i++; 
       }
 
     }
@@ -409,24 +411,33 @@ bool test_remove(bool debug){
       mTree.insert(rando); 
     }
 
-    
+    cout<<"original tree\n"; 
+    cout<<mTree<<endl; 
+    cout<<"----------------------\n";
+
+    int currSize = mTree.size(); 
+    int count = 0; 
     for(int i = 0; !mTree.empty(); i++){
       int rando = rand() % 100 + 1; 
       if(mTree.contains(rando)){
+        cout<<"i: "<<count<<endl; 
         cout<<"removing: "<<rando<<endl; 
         mTree.remove(rando); 
+        currSize--; 
         cout<<mTree<<endl; 
         cout<<"size: "<<mTree.size()<<endl; 
+        cout<<"currSize: "<<currSize<<endl; 
         cout<<"in order: "<<mTree.in_order()<<endl; 
         cout<<"------------------------------\n";
 
-        if(false){
+        if(mTree.contains(rando)){
           cout<<"FAILED TO REMOVE: "<<rando<<endl; 
           cout<<mTree<<endl; 
           cout<<"size: "<<mTree.size()<<endl; 
           cout<<"in order: "<<mTree.in_order()<<endl; 
           return false; 
         }
+        count++; 
       }
     }
 

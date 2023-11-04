@@ -213,25 +213,25 @@ void BTree<T>::fix_shortage(int shortIndex){
     bool STEAL_RIGHT = (right && right->data_count > MINIMUM), STEAL_LEFT = left && left->data_count > MINIMUM, BEGIN_CASE = (shortIndex == 0); 
 
     if(STEAL_RIGHT){//can steal from right
-        cout<<"steal right\n"; 
-        //cout<<"short index: "<<shortIndex<<endl;
-        //cout<<"before steal from right\n";
-        //cout<<*this<<endl; 
-        //cout<<"--------------------\n";
+        //cout<<"steal right\n"; 
+        cout<<"short index: "<<shortIndex<<endl;
+        cout<<"before steal from right\n";
+        cout<<*this<<endl; 
+        cout<<"--------------------\n";
         rotate_left(shortIndex); 
-       // cout<<"after steal from right\n";
-       // cout<<*this<<endl; 
-       // cout<<"--------------------\n";
+        cout<<"after steal from right\n";
+        cout<<*this<<endl; 
+        cout<<"--------------------\n";
     }
     else if(STEAL_LEFT){//can steal from left
       //  cout<<"short index: "<<shortIndex<<endl; 
        cout<<"before steal from left\n";
-       // cout<<*this<<endl; 
-       // cout<<"--------------------\n";
+       cout<<*this<<endl; 
+       cout<<"--------------------\n";
         rotate_right(shortIndex); 
-        //cout<<"after steal from left\n";
-        //cout<<*this<<endl; 
-        //cout<<"--------------------\n";
+        cout<<"after steal from left\n";
+        cout<<*this<<endl; 
+        cout<<"--------------------\n";
     }
     else if(BEGIN_CASE){//begin case
         cout<<"before begin\n";
@@ -261,9 +261,13 @@ template <typename T>
 void BTree<T>::loose_remove(const T& entry){ //at this point, im assuming entry is in here, will call find
     int goToIndex = first_ge(data, data_count, entry); 
 
-    if(data[goToIndex] == entry){//found
+    if(goToIndex < data_count && data[goToIndex] == entry){//found
         T temp; 
         delete_item(data, goToIndex, data_count, temp); 
+        cout<<"index: "<<goToIndex<<endl;
+        cout<<"deleting: "<<data[goToIndex]<<endl; 
+        cout<<"del: "<<temp<<endl;
+        //data[goToIndex] = -1; //make sure we really delete 
         if(!is_leaf()){
             T replaceWith; 
             subset[goToIndex]->remove_biggest(replaceWith); //so we don't go to excess replace of this subtree we found
@@ -419,7 +423,7 @@ T* BTree<T>::find(const T& entry){
     int index = first_ge(data, data_count, entry);  //will this work with an empty BTree?
     T* foundPtr = nullptr; 
     
-    if(data[index] == entry){
+    if(index < data_count && data[index] == entry){
         /*cout<<"data_count: "<<data_count<<endl; 
         cout<<"child_count: "<<child_count<<endl; 
         cout<<"index: "<<index<<endl; 
