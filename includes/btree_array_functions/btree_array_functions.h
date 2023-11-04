@@ -99,7 +99,7 @@ int itemsToDelete = n2;
 T deleted; 
     for(int i = 0; i < itemsToDelete; i++){
         delete_item(data2, 0, n2, deleted);  
-        ordered_insert(data1, n1, deleted); 
+        insert_item(data1, n1,n1, deleted); 
     }
 } 
 

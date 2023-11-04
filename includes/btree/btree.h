@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "../../includes/btree_array_functions/btree_array_functions.h" 
+#include <assert.h>
 
 using namespace std; 
 
@@ -138,12 +139,25 @@ BTree<T>::~BTree(){ //destructor
 template <typename T>
 void BTree<T>::rotate_left(int index){//hmm
     T deleted;
+    BTree<T>* deletedChild; 
     BTree<T>* shortChild = subset[index];  //rotate to 
     BTree<T>* right = subset[index + 1]; //borrowing from right
-    delete_item(data, index, data_count, deleted); //might just do a swap here hmm
+
+    //int ins = first_ge(data, data_count, right->data[0]);  //won't work
+    delete_item(data, index, data_count, deleted); //index = 0 //ust do index
     ordered_insert(shortChild->data, shortChild->data_count, deleted);
     delete_item(right->data, 0,right->data_count, deleted); 
     ordered_insert(data, data_count, deleted); 
+    //steal child 
+    if(!right->is_leaf()){
+         delete_item(right->subset, 0, right->child_count, deletedChild); 
+         //cout<<"child_count: "<<shortChild->child_count<<endl; 
+         insert_item(shortChild->subset, shortChild->data_count, shortChild->child_count, deletedChild); //getting from right so should be larger 
+         //cout<<"child_count: "<<shortChild->child_count<<endl; 
+         //cout<<"insertedChild: "<<shortChild->subset[shortChild->data_count]->data[0]<<endl; 
+    }
+
+    //merge_with_next_subset(index); 
 }              
 
 //transfer one element LEFT from child i
@@ -151,12 +165,24 @@ void BTree<T>::rotate_left(int index){//hmm
 template <typename T>
 void BTree<T>::rotate_right(int index){//not deleting anything when rotating 
     T deleted; 
+    BTree<T>* deletedChild; 
     BTree<T>* shortChild = subset[index]; 
     BTree<T>* left = subset[index - 1]; 
     delete_item(data, index - 1, data_count, deleted); //might just do a swap here hmm //was 0 before, what if short index is 0 will never be
     ordered_insert(shortChild->data, shortChild->data_count, deleted); 
     delete_item(left->data, left->data_count - 1, left->data_count, deleted); 
     ordered_insert(data, data_count, deleted); 
+    //merge_with_next_subset(index); 
+
+    //steal child
+    if(!left->is_leaf()){
+        delete_item(left->subset, left->child_count - 1, left->child_count, deletedChild); //stealing right most child
+        insert_item(shortChild->subset, 0, shortChild->child_count, deletedChild); 
+    }
+   //
+    //cout<<"stolen child: "<<deletedChild->data[0]<<endl; 
+    //int childIns = first_ge(left->data, left->data_count, deletedChild->data[0]); 
+    //
 }
 //transfer one element RIGHT from child i
 
@@ -187,24 +213,47 @@ void BTree<T>::fix_shortage(int shortIndex){
     bool STEAL_RIGHT = (right && right->data_count > MINIMUM), STEAL_LEFT = left && left->data_count > MINIMUM, BEGIN_CASE = (shortIndex == 0); 
 
     if(STEAL_RIGHT){//can steal from right
-        cout<<"steal from right\n";
+        cout<<"steal right\n"; 
+        //cout<<"short index: "<<shortIndex<<endl;
+        //cout<<"before steal from right\n";
+        //cout<<*this<<endl; 
+        //cout<<"--------------------\n";
         rotate_left(shortIndex); 
+       // cout<<"after steal from right\n";
+       // cout<<*this<<endl; 
+       // cout<<"--------------------\n";
     }
     else if(STEAL_LEFT){//can steal from left
-        cout<<"steal from left\n";
+      //  cout<<"short index: "<<shortIndex<<endl; 
+       cout<<"before steal from left\n";
+       // cout<<*this<<endl; 
+       // cout<<"--------------------\n";
         rotate_right(shortIndex); 
+        //cout<<"after steal from left\n";
+        //cout<<*this<<endl; 
+        //cout<<"--------------------\n";
     }
     else if(BEGIN_CASE){//begin case
-        cout<<"begin\n";
+        cout<<"before begin\n";
+        cout<<*this<<endl; 
+        cout<<"--------------------\n";
         delete_item(data, 0, data_count, deleted); //delete begin
         ordered_insert(shortChild->data, shortChild->data_count, deleted); 
         merge_with_next_subset(shortIndex); 
+        cout<<"after begin\n";
+        cout<<*this<<endl; 
+        cout<<"--------------------\n";
     }
     else{
-        cout<<"end\n";
+        cout<<"before other\n";
+        cout<<*this<<endl; 
+        cout<<"--------------------\n";
         delete_item(data, shortIndex - 1, data_count, deleted); //delete last //first less than equal
         ordered_insert(shortChild->data, shortChild->data_count, deleted);
         merge_with_next_subset(shortIndex - 1);
+        cout<<"after other\n";
+        cout<<*this<<endl; 
+        cout<<"--------------------\n";
     }
 }      
                                                 
@@ -230,7 +279,7 @@ void BTree<T>::loose_remove(const T& entry){ //at this point, im assuming entry 
 
     if(!is_leaf() && subset[goToIndex]->data_count < MINIMUM){
         fix_shortage(goToIndex); //goToIndex should be short index
-    }         
+    }     
 } //allows MINIMUM-1 data
 
 
@@ -238,7 +287,7 @@ template <typename T>
 void BTree<T>::remove_biggest(T& entry){ //find the biggest node of the given tree and put it into entry
     if(!is_leaf()){
         subset[child_count - 1]->remove_biggest(entry); //go right again
-        if(subset[child_count - 1] && subset[child_count -1]->data_count < MINIMUM){
+        if(!is_leaf() && subset[child_count -1]->data_count < MINIMUM){
             fix_shortage(child_count - 1);
         }
     }
@@ -267,7 +316,6 @@ void BTree<T>::remove(const T& entry){ //some later time
         delete child; 
         child = nullptr; 
     }
-
 }//remove entry from the tree
 
 
@@ -370,7 +418,13 @@ template <typename T> //here
 T* BTree<T>::find(const T& entry){
     int index = first_ge(data, data_count, entry);  //will this work with an empty BTree?
     T* foundPtr = nullptr; 
+    
     if(data[index] == entry){
+        /*cout<<"data_count: "<<data_count<<endl; 
+        cout<<"child_count: "<<child_count<<endl; 
+        cout<<"index: "<<index<<endl; 
+        cout<<"bloc: "<<data[0]<<endl; 
+        cout<<"data: "<<data[index]<<endl; */
         return (data + index); 
     }
     else if(is_leaf()){
@@ -396,7 +450,7 @@ int BTree<T>::size() const{
 
 template <typename T>
 bool BTree<T>::empty() const{
-    return (data_count < 0 && child_count < 0); //i think? cause if we have no data than we must be empty
+    return (data_count == 0 && child_count == 0); //i think? cause if we have no data than we must be empty
 }  //true if the tree is empty
 
 template <typename T> 
@@ -405,7 +459,7 @@ void BTree<T>::print_tree(int level, ostream &outs) const{ //needs testing
         if(i!= -1 && !is_leaf())
             subset[i]->print_tree(level + 1, outs); //child will always be one more than data count  
         if(i!= 0){
-            outs<<setw(6 * level)<<"["<<data[i - 1]<<"]"<<"dc: "<<data_count<<endl; 
+            outs<<setw(6 * level)<<"["<<data[i - 1]<<"]"<<"cc: "<<child_count<<" dc: "<<data_count<<endl; 
             //if(child_count == 0 && subset[0])
                 //outs<<"add: "<<subset[0]->data[0]<<endl; 
         

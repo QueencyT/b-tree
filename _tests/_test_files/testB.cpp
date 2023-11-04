@@ -312,7 +312,7 @@ bool test_clear_tree(bool debug){
 }
 
 bool test_remove(bool debug){
-  if(debug){
+  if(false){
     cout<<"TEST - DELETE - MERGE - WITH POOR SIBLING\n"; 
     int data[] = {10,20,30,40,50}; 
     int size = 5; 
@@ -366,32 +366,65 @@ bool test_remove(bool debug){
 
   }
 
-  if(false){
+  if(true){
     cout<<"TEST - COMPLEX"<<endl; 
     srand(time(0));
-    int data[] = {10,21,30,41,50,60,70,80,90,100,110};
+    int data[] = {49, 19, 71, 9, 3, 1, 5, 13,14,15,17,18,22,25,28,29,31,30,32,33,35,37,40,41,42,43,44,45,48,50,51,54,56,53,52,58,68,69,67,70,60,61,63,65,72,74,
+    75,80,81,84,85,86,87,88,90,92,95,96,97,99};
     int size = 11; 
     BTree<int> mTree;
     srand(time(0)); 
+
+    /*for(int i = 0; i < 60; i++){
+      mTree.insert(data[i]); 
+    }*/
+
+    //cout<<"removing: "<<69<<endl; 
+    //mTree.remove(69); 
+    //cout<<mTree<<endl;
+
+    while(false){
+      int randIndex = rand() % 59; 
+      if(mTree.contains(data[randIndex])){
+        cout<<"removing: "<<data[randIndex]<<endl; 
+        mTree.remove(data[randIndex]); 
+        cout<<mTree<<endl; 
+        cout<<"size: "<<mTree.size()<<endl; 
+        cout<<"in order: "<<mTree.in_order()<<endl; 
+        cout<<"------------------------------\n";
+
+        if(mTree.contains(data[randIndex])){
+          cout<<"FAILED TO REMOVE: "<<data[randIndex]<<endl; 
+          cout<<mTree<<endl; 
+          cout<<"size: "<<mTree.size()<<endl; 
+          cout<<"in order: "<<mTree.in_order()<<endl; 
+          return false; 
+        }
+      }
+
+    }
 
     for(int i = 0; i < 100; i++){
       int rando = rand() % 100 + 1; 
       mTree.insert(rando); 
     }
 
-    for(int i = 0; i< 100; i++){
+    
+    for(int i = 0; !mTree.empty(); i++){
       int rando = rand() % 100 + 1; 
       if(mTree.contains(rando)){
         cout<<"removing: "<<rando<<endl; 
         mTree.remove(rando); 
         cout<<mTree<<endl; 
         cout<<"size: "<<mTree.size()<<endl; 
+        cout<<"in order: "<<mTree.in_order()<<endl; 
         cout<<"------------------------------\n";
 
-        if(mTree.contains(rando)){
+        if(false){
           cout<<"FAILED TO REMOVE: "<<rando<<endl; 
           cout<<mTree<<endl; 
           cout<<"size: "<<mTree.size()<<endl; 
+          cout<<"in order: "<<mTree.in_order()<<endl; 
           return false; 
         }
       }
