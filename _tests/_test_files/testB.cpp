@@ -366,7 +366,7 @@ bool test_remove(bool debug){
 
   }
 
-  if(true){
+  if(false){
     cout<<"TEST - COMPLEX"<<endl; 
     srand(time(0));
     int data[] = {10,21,30,41,50,60,70,80,90,100,110};

@@ -396,7 +396,7 @@ int BTree<T>::size() const{
 
 template <typename T>
 bool BTree<T>::empty() const{
-    return (data_count == 0 && child_count == 0); //i think? cause if we have no data than we must be empty
+    return (data_count < 0 && child_count < 0); //i think? cause if we have no data than we must be empty
 }  //true if the tree is empty
 
 template <typename T> 
