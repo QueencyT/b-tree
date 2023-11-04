@@ -197,7 +197,7 @@ void BTree<T>::fix_shortage(int shortIndex){
     }
     else if(END_CASE){
         //cout<<"end\n";
-        delete_item(data, data_count - 1, data_count, deleted); //delete last
+        delete_item(data, shortIndex - 1, data_count, deleted); //delete last
         ordered_insert(shortChild->data, shortChild->data_count, deleted);
         merge_with_next_subset(shortIndex - 1);
         //child_count--;  merfe with next already takes care of dec chld_count
@@ -210,11 +210,6 @@ void BTree<T>::fix_shortage(int shortIndex){
         //cout<<"child_count: "<<child_count<<endl;  
         merge_with_next_subset(shortIndex); 
        // cout<<"child_count: "<<child_count<<endl; 
-    }
-    else{//mid case
-        delete_item(data, shortIndex - 1, data_count, deleted); //delete mid
-        ordered_insert(shortChild->data, shortChild->data_count, deleted); 
-        merge_with_next_subset(shortIndex - 1);  
     }
 }      
                                                 
@@ -269,14 +264,10 @@ void BTree<T>::remove(const T& entry){ //some later time
     loose_remove(entry); 
     BTree<T>* child = subset[0];  
     if(data_count == 0 && !is_leaf()){//if we ourself is short  
+        child_count = 0;
         copy_array(data, child->data, data_count, child->data_count);
+        copy_array(subset, child->subset, child_count, child->child_count); 
 
-        if(!child->is_leaf()){ 
-            copy_array(subset, child->subset, child_count, child->child_count); 
-        }
-        else{
-           child_count--; 
-        }
             
         child->data_count = 0; 
         child->child_count = 0; 
